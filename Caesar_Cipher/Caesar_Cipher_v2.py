@@ -27,7 +27,8 @@ def get_text():
             return text
         else:
             print(
-                "Invalid input! Please use English letters only (a-z).\n Characters like 'ü' or '123' are not allowed."
+                "Invalid input! Please use English letters only (a-z).\n"
+                "Characters like 'ü' or '123' are not allowed."
             )
 
 
