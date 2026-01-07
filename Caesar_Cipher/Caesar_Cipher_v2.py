@@ -58,6 +58,10 @@ def caesar(text, shift, mode):
 
         else:
             print('Please only type the letters "D" and "E": ')
+    # Inform the user which operation will be performed and the effective shift
+    mode_name = "decrypting" if shift < 0 else "encrypting"
+    effective_shift = abs(shift)
+    print(f"Now {mode_name} with a shift of {effective_shift} positions.")
 
     shifted_alphabet = ALPHABET[shift:] + ALPHABET[:shift]
     translation_table = str.maketrans(
@@ -68,8 +72,15 @@ def caesar(text, shift, mode):
 
 
 # --- Execution ---
+print("Caesar Cipher — a simple shift-based text encryptor/decryptor.")
+print(
+    "You will be asked for the text, a shift value (1-25), and whether to encrypt or decrypt."
+)
+
 user_text = get_text()
+print(f"Text received: {user_text}")
 user_shift = get_shift()
+print(f"Shift value set to: {user_shift}")
 
 output = caesar(user_text, user_shift, mode=True)
-print(f"Output: {output}")
+print(f"Final result: {output}")
