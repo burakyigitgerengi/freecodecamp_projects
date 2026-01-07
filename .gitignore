@@ -1,2 +1,3 @@
 .conda/
 Medical_Data_Validator/medical_records.json
+User_Configuration_Manager/user_conf_manager_v2.py

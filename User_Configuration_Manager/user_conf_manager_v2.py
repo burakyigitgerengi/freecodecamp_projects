@@ -2,100 +2,126 @@ import json
 import os
 
 DB_FILE = "settings.json"
-DEFAULT_SETTINGS = {"username": "", "theme": "dark", "language": "en"}
+DEFAULT_SETTINGS = {
+    "username": "User",
+    "theme": "dark",
+    "language": "en",
+    "notifications": True,
+    "volume": 75,
+    "auto_update": True,
+}
 
 
-def get_user_config():
-    if not os.path.exists(DB_FILE):
-        with open(DB_FILE, "w") as f:
-            json.dump(DEFAULT_SETTINGS, f, indent=4)
-        return DEFAULT_SETTINGS
-
+def load_settings():
+    """Load settings from file or create default."""
     try:
-        with open(DB_FILE, "r") as f:
-            settings = json.load(f)
-        if settings.keys() == DEFAULT_SETTINGS.keys():
-            return settings
-        else:
-            print("CORRUPTED SETTINGS FILE, CREATING A NEW ONE.")
-            with open(DB_FILE, "w") as f:
-                json.dump(DEFAULT_SETTINGS, f, indent=4)
-            return DEFAULT_SETTINGS
+        if os.path.exists(DB_FILE):
+            with open(DB_FILE) as f:
+                data = json.load(f)
+                if data.keys() == DEFAULT_SETTINGS.keys():
+                    return data
+                print("ERROR: Corrupted settings file, resetting to defaults.")
 
-    except (OSError, json.JSONDecodeError):
-        print("CORRUPTED SETTINGS FILE, CREATING A NEW ONE.")
         with open(DB_FILE, "w") as f:
             json.dump(DEFAULT_SETTINGS, f, indent=4)
-        return DEFAULT_SETTINGS
+        return DEFAULT_SETTINGS.copy()
+
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"ERROR: {e}. Using default settings.")
+        return DEFAULT_SETTINGS.copy()
 
 
-settings = get_user_config()
-
-
-def add_update_setting(key, value):
-    if key in DEFAULT_SETTINGS:
-        settings[key] = value
+def save_settings(settings):
+    """Save settings to file."""
+    try:
         with open(DB_FILE, "w") as f:
             json.dump(settings, f, indent=4)
-        print(f"Setting '{key}' added/updated with value '{value}' successfully!")
         return True
-    else:
-        print(f"Invalid setting: {key}")
+    except OSError as e:
+        print(f"ERROR: Could not save settings: {e}")
         return False
 
 
-def delete_setting(key):
-    if not isinstance(key, str):
-        print("Invalid key type")
-        return
+def parse_value(value_str, expected_type):
+    """Convert string input to the expected type."""
+    if expected_type == bool:
+        val = value_str.lower().strip()
+        if val in ("true", "1", "yes", "on"):
+            return True, True
+        elif val in ("false", "0", "no", "off"):
+            return False, True
+        return None, False
 
-    key = key.lower()
+    elif expected_type == int:
+        try:
+            return int(value_str), True
+        except ValueError:
+            return None, False
 
-    if key in settings:
-        settings.pop(key)
-        with open(DB_FILE, "w") as f:
-            json.dump(settings, f, indent=4)
-        print(f"Setting '{key}' deleted successfully!")
-    else:
-        print(f"Setting '{key}' does not exist! Cannot delete a non-existing setting.")
-
-
-def view_settings(settings):
-    if not settings:
-        return "No settings available."
-
-    result = "Current User Settings:\n"
-    for key, value in settings.items():
-        capitalized_key = key.capitalize()
-        result += f"{capitalized_key}: {value}\n"
-    return result
+    return value_str, True
 
 
 def main():
+    settings = load_settings()
+
+    print("=" * 40)
     print("User Configuration Manager")
+    print("=" * 40)
+
     while True:
         print("\nOptions:")
         print("1. View settings")
-        print("2. Add/Update setting")
+        print("2. Update setting")
         print("3. Delete setting")
         print("4. Exit")
 
-        choice = input("Enter your choice: ")
+        choice = input("\nEnter choice (1-4): ").strip()
 
         if choice == "1":
-            print(view_settings(settings))
+            print("\nCurrent Settings:")
+            print("-" * 30)
+            for key, value in settings.items():
+                print(f"{key.replace('_', ' ').title()}: {value}")
+
         elif choice == "2":
-            key = input("Enter setting name: ")
-            value = input("Enter value: ")
-            add_update_setting(key, value)
+            key = input("Setting name: ").strip().lower()
+
+            if key not in DEFAULT_SETTINGS:
+                print(
+                    f"ERROR: Invalid setting. Valid: {', '.join(DEFAULT_SETTINGS.keys())}"
+                )
+                continue
+
+            value_str = input(f"New value: ").strip()
+            value, valid = parse_value(value_str, type(DEFAULT_SETTINGS[key]))
+
+            if not valid:
+                type_name = type(DEFAULT_SETTINGS[key]).__name__
+                print(f"ERROR: Invalid {type_name} value.")
+                continue
+
+            settings[key] = value
+            if save_settings(settings):
+                print(f"✓ Setting '{key}' updated to '{value}'")
+
         elif choice == "3":
-            key = input("Enter setting name to delete: ")
-            delete_setting(key)
+            key = input("Setting to delete: ").strip().lower()
+
+            if key not in settings:
+                print(f"ERROR: Setting '{key}' does not exist.")
+                continue
+
+            del settings[key]
+            if save_settings(settings):
+                print(f"✓ Setting '{key}' deleted")
+
         elif choice == "4":
-            print("Goodbye!")
+            print("\nGoodbye!")
             break
+
         else:
-            print("Invalid choice.")
+            print("ERROR: Invalid choice. Enter 1-4.")
 
 
-main()
+if __name__ == "__main__":
+    main()
