@@ -4,12 +4,6 @@ import os
 
 DB_FILE = "medical_records.json"
 
-
-def clear():
-    """Clear the terminal screen for a cleaner UI."""
-    os.system("cls" if os.name == "nt" else "clear")
-
-
 # ========================
 # DATABASE
 # ========================
@@ -39,7 +33,7 @@ def save_records(records):
 
 def get_patient_input():
     """Get patient information from user with validation."""
-    clear()
+
     print("\n" + "-" * 50)
     print("ADD NEW PATIENT RECORD")
     print("-" * 50)
@@ -121,7 +115,7 @@ def get_patient_input():
 
 
 def view_all_records(records):
-    clear()
+
     if not records:
         print("\nNo records found")
         return
@@ -141,7 +135,7 @@ def view_all_records(records):
 
 
 def search_patient(records):
-    clear()
+
     if not records:
         print("\nNo records to search")
         return
@@ -173,7 +167,7 @@ def main():
     records = load_records()
 
     while True:
-        clear()
+
         print("\n" + "-" * 50)
         print("MEDICAL RECORDS MANAGEMENT SYSTEM")
         print("-" * 50)
