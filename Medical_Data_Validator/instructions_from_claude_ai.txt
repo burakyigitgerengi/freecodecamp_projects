@@ -1,0 +1,33 @@
+Learning Goals & Plan
+Here's a structured approach to make it interactive:
+Phase 1: Understand the Current Code ✓
+
+Run it and see what happens
+Understand each validation rule
+Identify what makes a record "invalid"
+
+Phase 2: Add Basic User Interaction
+Goal: Let users add a single patient record through input prompts
+Steps:
+
+Create a function get_patient_input() that asks for each field
+Convert age to integer, medications string to list
+Validate the input using your existing function
+Add the record if valid, or show errors and let them try again
+
+Phase 3: Build a Menu System
+Goal: Create a simple menu for different actions
+Options:
+
+Add a new patient record
+View all records
+Validate all existing records
+Exit
+
+Phase 4: Enhanced Features (optional)
+
+Edit existing records
+Delete records
+Save/load from a file
+Search for specific patients
+
